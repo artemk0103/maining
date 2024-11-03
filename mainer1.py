@@ -8,19 +8,15 @@ import time
 BASE_URL   = f'http://213.189.53.91:1488'
 
 
-wallet     = 'doxerpidorcoziestozhe' # Адрес кошелька
-difficulty = 6 # Сложность (минимум 5). Чем выше это значение, тем больше приносит майнинг, однако тем больше затраты по времени добычи блока.
+wallet  = 'doxerpidorcoziestozhe' # Адрес кошелька
+difficulty = 6 # Сложность (минимум 6). Чем выше это значение, тем больше приносит майнинг, однако тем больше затраты по времени добычи блока.
 
 
 uid = random.randint(1_000_000, 9_999_999)
 
 
 def get_last_block() -> dict:
-    data = {
-        'uid': uid
-    }
-
-    request = urllib.request.Request(f'{BASE_URL}/blockchain/lastBlock', json.dumps(data).encode(), {'Content-Type': 'application/json'}, method='GET')
+    request = urllib.request.Request(f'{BASE_URL}/blockchain/lastBlock?uid={uid}', None, {'Content-Type': 'application/json'}, method='GET')
     response = urllib.request.urlopen(request)
     data = response.read()
     data = json.loads(data.decode('utf-8'))
@@ -49,8 +45,10 @@ def new_blockchain() -> None:
     }
 
     request = urllib.request.Request(f'{BASE_URL}/blockchain/new', json.dumps(data).encode(), {'Content-Type': 'application/json'}, method='POST')
-    urllib.request.urlopen(request)
-
+    try:
+        urllib.request.urlopen(request)
+    except:
+        pass
 
 def hash(block: dict) -> str:
     string = json.dumps(block, sort_keys=True).encode()
@@ -94,3 +92,4 @@ while True:
     except Exception as e:
         print(f'Error {e}. Reconnecting in 5 seconds...')
         time.sleep(5)
+        new_blockchain()        
